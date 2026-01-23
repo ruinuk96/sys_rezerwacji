@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { supabase } from './supabaseClient'
-import { Routes, Route, useNavigate } from 'react-router-dom'
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom'
 import bcryptjs from 'bcryptjs'
 import Dashboard from './Dashboard'
 import MyReservations from './MyReservations'
@@ -73,9 +73,11 @@ function Login() {
 function App() {
   return (
     <Routes>
+      <Route path="/" element={<Navigate to="/app" replace />} />
       <Route path="/app" element={<Login />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/my-reservations" element={<MyReservations />} />
+      <Route path="*" element={<Navigate to="/app" replace />} />
     </Routes>
   )
 }
