@@ -28,17 +28,17 @@ function MyReservations() {
   const login = (location.state as { login?: string } | null)?.login
 
   const [reservations, setReservations] = useState<Reservation[]>([])
-  const [pins, setPins] = useState<{ [key: number]: Pin }>({}) // PIN-y zmapowane po reservation_id
-  const [statusFilter, setStatusFilter] = useState<'all' | 'confirmed' | 'ended'>('all')
+  const [pins, setPins] = useState<{ [key: number]: Pin }>({})
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'ended'>('all')
 
-  // Jeśli brak userId lub login — wróć na /app
+
   useEffect(() => {
     if (!userId || !login) {
       navigate('/app', { replace: true })
     }
   }, [userId, login, navigate])
 
-  // Pobierz rezerwacje dla danego użytkownika
+
   useEffect(() => {
     const fetchReservations = async () => {
       if (!userId) return
@@ -55,7 +55,6 @@ function MyReservations() {
 
       setReservations(resData)
 
-      // Pobierz PIN-y dla każdej rezerwacji
       const { data: pinData, error: pinError } = await supabase
         .from('pins')
         .select('*')
@@ -73,7 +72,7 @@ function MyReservations() {
     fetchReservations()
   }, [userId])
 
-  // Formatuj datę (np. "13.01.2026 10:00")
+
   const formatStartDate = (dateStr: string): string => {
     const date = new Date(dateStr)
     const day = String(date.getDate()).padStart(2, '0')
@@ -96,7 +95,7 @@ function MyReservations() {
     const confirmed = confirm('Czy naprawdę chcesz anulować tę rezerwację?')
     if (!confirmed) return
 
-    // NAJPIERW usuń PIN-y powiązane z rezerwacją
+    // najpierw usuń PIN
     const { error: pinError } = await supabase
       .from('pins')
       .delete()
@@ -107,7 +106,7 @@ function MyReservations() {
       return
     }
 
-    // POTEM usuń rezerwację
+    // potem usuń rezerwację
     const { error: resError } = await supabase
       .from('reservations')
       .delete()
@@ -126,7 +125,7 @@ function MyReservations() {
 
     setReservations(newReservations ?? [])
     
-    // Odśwież PIN-y
+    // Odśwież PINy
     const { data: newPins } = await supabase
       .from('pins')
       .select('*')
@@ -162,15 +161,15 @@ function MyReservations() {
         <span>Filtr statusu:</span>
         <select
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as 'all' | 'confirmed' | 'ended')}
+          onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'ended')}
         >
           <option value="all">Wszystkie</option>
-          <option value="confirmed">Aktywne</option>
+          <option value="active">Aktywne</option>
           <option value="ended">Zakończone</option>
         </select>
       </div>
       
-      {/* Lista rezerwacji */}
+      {/*Lista rezerwacji*/}
       {filteredReservations.length === 0 ? (
         <p style={{ marginTop: '20px' }}>Nie masz żadnych rezerwacji.</p>
       ) : (
