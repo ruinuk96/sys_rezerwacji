@@ -19,7 +19,6 @@ function Dashboard() {
   const userId = (location.state as { userId?: number } | null)?.userId
   const login = (location.state as { login?: string } | null)?.login
 
-  // Jeśli brak loginu lub userId (np. odświeżenie) — wróć na /app
    useEffect(() => {
     if (!userId || !login) {
       navigate('/app', { replace: true })
@@ -59,32 +58,35 @@ function Dashboard() {
     })
   }
 
-  // Funkcja generująca klucz slotu (data + godzina)
   const getSlotKey = (date: Date, hour: number): string => {
     return `${date.toISOString().split('T')[0]} ${hour}`
   }
 
-  // Sprawdź czy slot jest wybrany
+
   const isSelected = (date: Date, hour: number): boolean => {
     return selectedSlots.includes(getSlotKey(date, hour))
   }
 
   // Obsługa kliknięcia w komórkę
   const handleSlotClick = (date: Date, hour: number) => {
-    if (isReserved(date, hour)) return // zablokowane
+    if (isReserved(date, hour)) return 
 
     const slotKey = getSlotKey(date, hour)
     
     if (selectedSlots.includes(slotKey)) {
-      // Odznacz
+      const sorted = [...selectedSlots].sort()
+      const indexToRemove = sorted.indexOf(slotKey)
+      
+      if (indexToRemove > 0 && indexToRemove < sorted.length - 1) {
+        // Walidacja: czy po usunięciu sloty nadal będą po kolei
+        return
+      }
+      
       setSelectedSlots(selectedSlots.filter(s => s !== slotKey))
     } else {
-      // Zaznacz, jeśli spełnia warunki
       const newSelection = [...selectedSlots, slotKey].sort()
-      
       // Walidacja: max 3 sloty
       if (newSelection.length > 3) return
-      
       // Walidacja: muszą być po kolei (ta sama data, kolejne godziny)
       if (newSelection.length > 1 && !areConsecutive(newSelection)) return
       
@@ -92,7 +94,6 @@ function Dashboard() {
     }
   }
 
-  // Sprawdź czy sloty są kolejne
   const areConsecutive = (slots: string[]): boolean => {
     if (slots.length <= 1) return true
     
@@ -100,12 +101,9 @@ function Dashboard() {
       const [dateStr, hourStr] = s.split(' ')
       return { date: dateStr, hour: parseInt(hourStr) }
     })
-    
-    // Wszystkie muszą być tego samego dnia
     const firstDate = parsed[0].date
     if (!parsed.every(p => p.date === firstDate)) return false
     
-    // Godziny muszą być kolejne
     for (let i = 1; i < parsed.length; i++) {
       if (parsed[i].hour !== parsed[i - 1].hour + 1) return false
     }
@@ -133,23 +131,16 @@ function Dashboard() {
   // Obsługa rezerwacji
   const handleReservation = async () => {
     if (selectedSlots.length === 0 || !userId) return
-    console.log('selectedSlots:', selectedSlots)
-    // Parsuj pierwszy i ostatni slot
     const sorted = [...selectedSlots].sort()
     const [firstDateStr, firstHourStr] = sorted[0].split(' ')
     const [lastDateStr, lastHourStr] = sorted[sorted.length - 1].split(' ')
-    console.log('firstDateStr:', firstDateStr)  // pokaż datę
-  console.log('firstHourStr:', firstHourStr)  // pokaż godzinę
     
     const [year, month, day] = firstDateStr.split('-').map(Number)
     const startTime = new Date(year, month - 1, day + 1, parseInt(firstHourStr), 0, 0, 0)
     
     const [yearEnd, monthEnd, dayEnd] = lastDateStr.split('-').map(Number)
     const endTime = new Date(yearEnd, monthEnd - 1, dayEnd + 1, parseInt(lastHourStr) + 1, 0, 0, 0)
-    console.log('startTime:', startTime)  // pokaż ostateczną datę
-  console.log('startTime ISO:', startTime.toISOString())  // w formacie SQL
     
-    // Wstaw rezerwację
     const { data: resData, error: resError } = await supabase
       .from('reservations')
       .insert({
@@ -166,7 +157,6 @@ function Dashboard() {
       return
     }
     
-    // Generuj PIN
     const pin = generatePin()
     
     // Wstaw PIN
@@ -185,7 +175,6 @@ function Dashboard() {
       return
     }
     
-    // Pokaż modal z PIN-em
     setGeneratedPin(pin)
     setShowModal(true)
     setSelectedSlots([])
@@ -198,24 +187,23 @@ function Dashboard() {
   }
 
 
-  // Dzień startowy tygodnia (poniedziałek)
+
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
     const today = new Date()
-    const dayOfWeek = today.getDay() // 0 = niedziela, 1 = pon, ..., 6 = sob
-    const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek // przesunięcie do poniedziałku
+    const dayOfWeek = today.getDay()
+    const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek 
     const monday = new Date(today)
     monday.setDate(today.getDate() + diff)
-    monday.setHours(0, 0, 0, 0) // zeruj czas
+    monday.setHours(0, 0, 0, 0)
     return monday
   })
 
   // Dni tygodnia
   const dayNames = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela']
   
-  // Godziny (przedziały)
+  // Godziny 
   const hours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
 
-  // Generuj daty dla aktualnego tygodnia
   const getWeekDates = () => {
     return dayNames.map((_, index) => {
       const date = new Date(currentWeekStart)
@@ -226,14 +214,12 @@ function Dashboard() {
 
   const weekDates = getWeekDates()
 
-  // Przesunięcie o tydzień
   const changeWeek = (weeks: number) => {
     const newDate = new Date(currentWeekStart)
     newDate.setDate(currentWeekStart.getDate() + weeks * 7)
     setCurrentWeekStart(newDate)
   }
 
-  // Formatowanie daty (np. "13.01.2026")
   const formatDate = (date: Date) => {
     const day = String(date.getDate()).padStart(2, '0')
     const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -297,7 +283,7 @@ function Dashboard() {
                         cursor: reserved ? 'not-allowed' : 'pointer'
                       }}
                     >
-                      {/* komórka */}
+
                     </td>
                   )
                 })}
