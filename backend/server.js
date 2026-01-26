@@ -12,6 +12,11 @@ app.use(express.json())
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE) // service key tylko w backendzie
 const DEVICE_TOKEN = process.env.DEVICE_TOKEN // prosty sekret dla ESP32
 
+// Prosty endpoint zdrowia serwisu
+app.get('/health', (req, res) => {
+  res.json({ ok: true, uptime: process.uptime() })
+})
+
 app.post('/pins/verify', async (req, res) => {
   try {
     const auth = req.headers.authorization || ''
