@@ -38,12 +38,10 @@ app.post('/pins/verify', async (req, res) => {
 
     if (error || !data) return res.status(403).json({ ok: false, reason: 'invalid_or_expired' })
 
-    // Oznacz jako użyty (do statystyk)
-    await supabase.from('pins').update({ used: true }).eq('id', data.id)
+    // Oznacz jako użyty (do statystyk) - wysłij w tle, nie czekaj
+    supabase.from('pins').update({ used: true }).eq('id', data.id)
 
-    // Log zdarzenia (opcjonalnie)
-    // await supabase.from('events').insert({ pin_id: data.id, device_id, event: 'access_granted' })
-
+    // Odpowiadaj natychmiast
     return res.json({ ok: true })
   } catch (e) {
     console.error(e)
