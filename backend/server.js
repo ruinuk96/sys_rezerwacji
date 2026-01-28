@@ -38,7 +38,7 @@ app.post('/pins/verify', async (req, res) => {
 
     if (error || !data) return res.status(403).json({ ok: false, reason: 'invalid_or_expired' })
 
-    // Oznacz jako użyty (do statystyk) - wysłij w tle, nie czekaj
+    // Oznacz jako użyty wyślij w tle
     supabase.from('pins').update({ used: true }).eq('id', data.id)
 
     // Odpowiadaj natychmiast
