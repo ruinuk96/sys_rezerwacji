@@ -6,7 +6,6 @@ import Dashboard from './Dashboard'
 import MyReservations from './MyReservations'
 import './App.css'
 
-// Definiujemy główny komponent App
 function Login() {
 
   const [login, setLogin] = useState('')
@@ -18,7 +17,6 @@ function Login() {
   const navigate = useNavigate()
 
   const handleLogin = async () => {
-    // Pobierz użytkownika po loginie (bez porównania hasła)
     const { data, error } = await supabase
       .from('users')
       .select('*')
@@ -30,7 +28,6 @@ function Login() {
       return
     }
 
-    // Porównaj hasło wprowadzone z zahaszowanym w bazie
     const isPasswordValid = await bcryptjs.compare(password, data.password_hash)
 
     if (!isPasswordValid) {
@@ -39,16 +36,13 @@ function Login() {
     }
 
     setMessage('Zalogowano')
-    // replace: true usuwa poprzedni wpis w historii, więc cofnięcie nie wraca do formularza
     navigate('/dashboard', { state: { userId: data.id, login: data.login }, replace: true })
   }
 
   return (
-    // Główny kontener aplikacji
     <main className="app">
       <h1>System rezerwacji</h1>
       <div className="login-form">
-        {/* Pole wejściowe do wpisania loginu */}
         <input
           type="text"
           placeholder="Login"
