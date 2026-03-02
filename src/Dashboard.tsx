@@ -153,7 +153,7 @@ function Dashboard() {
       .single()
     
     if (resError || !resData) {
-      alert('Błąd podczas tworzenia rezerwacji')
+      alert('Error while creating reservation')
       return
     }
     
@@ -171,7 +171,7 @@ function Dashboard() {
       })
     
     if (pinError) {
-      alert('Błąd podczas generowania PIN')
+      alert('Error while generating PIN')
       return
     }
     
@@ -199,7 +199,7 @@ function Dashboard() {
   })
 
   // Dni tygodnia
-  const dayNames = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela']
+  const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
   
   // Godziny 
   const hours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
@@ -229,20 +229,20 @@ function Dashboard() {
 
   return (
     <main className="app">
-      <h1>Panel użytkownika</h1>
+      <h1>User dashboard</h1>
       <div style={{ display: 'flex'}}>
-        <div style={{marginRight: 'auto'}}><span>Użytkownik: <strong>{login}</strong></span></div>
+        <div style={{marginRight: 'auto'}}><span>User: <strong>{login}</strong></span></div>
         <div style={{}}><button onClick={() => navigate('/my-reservations', { state: { userId, login } })}>
-          Twoje rezerwacje
+          My reservations
         </button></div>
-        <div style={{marginLeft: 'auto'}}><button onClick={() => navigate('/app', { replace: true })}>Wyloguj</button></div>
+        <div style={{marginLeft: 'auto'}}><button onClick={() => navigate('/app', { replace: true })}>Log out</button></div>
       </div>
       
       {/* Nawigacja tygodniami */}
       <div>
         <button onClick={() => changeWeek(-1)}>←</button>
         <span>
-          Tydzień: {formatDate(weekDates[0])} - {formatDate(weekDates[6])}
+          Week: {formatDate(weekDates[0])} - {formatDate(weekDates[6])}
         </span>
         <button onClick={() => changeWeek(1)}>→</button>
       </div>
@@ -251,7 +251,7 @@ function Dashboard() {
         <table>
           <thead>
             <tr>
-              <th>Godzina</th>
+              <th>Time</th>
               {weekDates.map((date, index) => (
                 <th key={index}>
                   {dayNames[index]}<br />
@@ -297,7 +297,7 @@ function Dashboard() {
       {selectedSlots.length > 0 && (
         <div style={{ marginTop: '20px' }}>
           <button onClick={handleReservation} style={{ padding: '10px 20px', fontSize: '16px' }}>
-            Zarezerwuj ({selectedSlots.length} {selectedSlots.length === 1 ? 'godzinę' : 'godziny'})
+            Reserve ({selectedSlots.length} {selectedSlots.length === 1 ? 'hour' : 'hours'})
           </button>
         </div>
       )}
@@ -322,14 +322,14 @@ function Dashboard() {
             textAlign: 'center',
             maxWidth: '400px'
           }}>
-            <h2>Rezerwacja potwierdzona!</h2>
-            <p>Twój kod PIN:</p>
+            <h2>Reservation confirmed!</h2>
+            <p>Your PIN code:</p>
             <h1 style={{ fontSize: '48px', margin: '20px 0', color: '#228be6' }}>{generatedPin}</h1>
             <p style={{ fontSize: '14px', color: '#666' }}>
-              Zapisz ten kod. Będzie aktywny tylko w trakcie trwania rezerwacji.
+              Save this code. It will be active only during the reservation period.
             </p>
             <button onClick={() => setShowModal(false)} style={{ marginTop: '20px', padding: '10px 30px' }}>
-              Zamknij
+              Close
             </button>
           </div>
         </div>

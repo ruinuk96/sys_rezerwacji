@@ -24,24 +24,24 @@ function Login() {
       .single()
 
     if (error || !data) {
-      setMessage('Niepoprawny login lub hasło')
+      setMessage('Invalid login or password')
       return
     }
 
     const isPasswordValid = await bcryptjs.compare(password, data.password_hash)
 
     if (!isPasswordValid) {
-      setMessage('Niepoprawny login lub hasło')
+      setMessage('Invalid login or password')
       return
     }
 
-    setMessage('Zalogowano')
+    setMessage('Logged in')
     navigate('/dashboard', { state: { userId: data.id, login: data.login }, replace: true })
   }
 
   return (
     <main className="app">
-      <h1>System rezerwacji</h1>
+      <h1>Room reservation system</h1>
       <div className="login-form">
         <input
           type="text"
@@ -52,12 +52,12 @@ function Login() {
 
         <input
           type="password"
-          placeholder="Hasło"
+          placeholder="Password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
         />
 
-        <button onClick={handleLogin}>Zaloguj</button>
+        <button onClick={handleLogin}>Log in</button>
         <p>{message}</p>
       </div>
     </main>

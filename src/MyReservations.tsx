@@ -92,7 +92,7 @@ function MyReservations() {
 
   // Anuluj rezerwację
   const handleCancel = async (reservationId: number) => {
-    const confirmed = confirm('Czy naprawdę chcesz anulować tę rezerwację?')
+    const confirmed = confirm('Are you sure you want to cancel this reservation?')
     if (!confirmed) return
 
     // najpierw usuń PIN
@@ -102,7 +102,7 @@ function MyReservations() {
       .eq('reservation_id', reservationId)
 
     if (pinError) {
-      alert('Błąd podczas usuwania PIN-ów')
+      alert('Error while deleting PIN codes')
       return
     }
 
@@ -113,7 +113,7 @@ function MyReservations() {
       .eq('id', reservationId)
 
     if (resError) {
-      alert('Błąd podczas anulowania rezerwacji: ' + resError.message)
+      alert('Error while canceling reservation: ' + resError.message)
       return
     }
 
@@ -147,31 +147,31 @@ function MyReservations() {
 
   return (
     <main className="app">
-      <h1>Twoje rezerwacje</h1>
+      <h1>My reservations</h1>
       <div style={{ display: 'flex'}}>
-        <div style={{ marginRight: 'auto'}}>Użytkownik: <strong>{login}</strong></div>
+        <div style={{ marginRight: 'auto'}}>User: <strong>{login}</strong></div>
         <div style={{ marginLeft: 'auto'}}>
         <button onClick={() => navigate('/dashboard', { state: { userId, login }, replace: true })}>
-          Powrót do kalendarza
+          Back to calendar
         </button>
         </div>
       </div>
 
       <div style={{ marginTop: '16px', display: 'flex', gap: '10px', alignItems: 'center' }}>
-        <span>Filtr statusu:</span>
+        <span>Status filter:</span>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'ended')}
         >
-          <option value="all">Wszystkie</option>
-          <option value="active">Aktywne</option>
-          <option value="ended">Zakończone</option>
+          <option value="all">All</option>
+          <option value="active">Active</option>
+          <option value="ended">Ended</option>
         </select>
       </div>
       
       {/*Lista rezerwacji*/}
       {filteredReservations.length === 0 ? (
-        <p style={{ marginTop: '20px' }}>Nie masz żadnych rezerwacji.</p>
+        <p style={{ marginTop: '20px' }}>You have no reservations.</p>
       ) : (
         <ul style={{ marginTop: '20px', listStyle: 'none', padding: 0 }}>
           {filteredReservations.map((reservation) => {
@@ -187,20 +187,20 @@ function MyReservations() {
                 }}
               >
                 <div>
-                  <strong>Data i czas:</strong> {formatStartDate(reservation.start_time)} - {formatEndDate(reservation.end_time)}
+                  <strong>Date and time:</strong> {formatStartDate(reservation.start_time)} - {formatEndDate(reservation.end_time)}
                 </div>
                 <div style={{ marginTop: '8px' }}>
-                  <strong>PIN:</strong> {pin ? <code style={{ fontSize: '18px', fontWeight: 'bold', color: '#228be6' }}>{pin.pin_code}</code> : 'Brak PIN-u'}
+                  <strong>PIN:</strong> {pin ? <code style={{ fontSize: '18px', fontWeight: 'bold', color: '#228be6' }}>{pin.pin_code}</code> : 'No PIN'}
                 </div>
                 <div style={{ marginTop: '8px' }}>
-                  <strong>Status: </strong> 
-                  {reservation.status === 'active' ? <span style={{color: 'green'}}>Aktywna</span> : reservation.status === 'ended' ? <span style={{color: 'red'}}>Zakończona</span> : ''}
+                  <strong>Status: </strong>
+                  {reservation.status === 'active' ? <span style={{color: 'green'}}>Active</span> : reservation.status === 'ended' ? <span style={{color: 'red'}}>Ended</span> : ''}
                 </div>
                 <div style={{ marginTop: '8px' }}>
                 <button
                   onClick={() => handleCancel(reservation.id)}
                 >
-                  Anuluj rezerwację
+                  Cancel reservation
                 </button>
                 </div>
               </li>
