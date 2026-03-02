@@ -169,7 +169,7 @@ function MyReservations() {
         </select>
       </div>
       
-      {/*Lista rezerwacji*/}
+      
       {filteredReservations.length === 0 ? (
         <p style={{ marginTop: '20px' }}>You have no reservations.</p>
       ) : (
